@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — EduPortal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="dashboard-page">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-icon">⬡</span>
+      <span class="logo-text">EduPortal</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#overview" class="nav-item active">
+        <span class="nav-icon">◈</span> Overview
+      </a>
+      <a href="#courses" class="nav-item">
+        <span class="nav-icon">◉</span> My Courses
+      </a>
+      <a href="#grades" class="nav-item">
+        <span class="nav-icon">◎</span> Grades
+      </a>
+      <a href="#announcements" class="nav-item">
+        <span class="nav-icon">◌</span> Announcements
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar-sm">{{ student.avatar_initials }}</div>
+        <div class="user-info-sm">
+          <span class="user-name-sm">{{ student.name.split()[0] }}</span>
+          <span class="user-id-sm">{{ student.student_id }}</span>
+        </div>
+      </div>
+      <a href="/logout" class="logout-btn">⏻ Logout</a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2 class="page-title">Dashboard</h2>
+        <span class="page-date">{{ current_date }}</span>
+      </div>
+      <div class="topbar-right">
+        <div class="search-bar">
+          <span>🔍</span>
+          <input type="text" placeholder="Search courses, grades...">
+        </div>
+        <div class="topbar-avatar">{{ student.avatar_initials }}</div>
+      </div>
+    </header>
+
+    <!-- Welcome Banner -->
+    <section class="welcome-banner" id="overview">
+      <div class="welcome-text">
+        <p class="welcome-greeting">Good day,</p>
+        <h1 class="welcome-name">{{ student.name }} 👋</h1>
+        <p class="welcome-sub">{{ student.department }} · Year {{ student.year }} · {{ student.student_id }}</p>
+      </div>
+      <div class="welcome-badge">
+        <span class="badge-label">CGPA</span>
+        <span class="badge-value">{{ student.cgpa }}</span>
+        <span class="badge-rank">Top 10%</span>
+      </div>
+      <div class="welcome-orb"></div>
+    </section>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card stat-blue">
+        <div class="stat-card-icon">📚</div>
+        <div class="stat-card-data">
+          <span class="stat-card-value">{{ enrollments|length }}</span>
+          <span class="stat-card-label">Enrolled Courses</span>
+        </div>
+      </div>
+      <div class="stat-card stat-green">
+        <div class="stat-card-icon">✦</div>
+        <div class="stat-card-data">
+          <span class="stat-card-value">{{ total_credits }}</span>
+          <span class="stat-card-label">Total Credits</span>
+        </div>
+      </div>
+      <div class="stat-card stat-amber">
+        <div class="stat-card-icon">📊</div>
+        <div class="stat-card-data">
+          <span class="stat-card-value">{{ avg_attendance }}%</span>
+          <span class="stat-card-label">Avg. Attendance</span>
+        </div>
+      </div>
+      <div class="stat-card stat-purple">
+        <div class="stat-card-icon">🏆</div>
+        <div class="stat-card-data">
+          <span class="stat-card-value">{{ student.cgpa }}</span>
+          <span class="stat-card-label">Current CGPA</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Courses + Announcements Row -->
+    <div class="content-row">
+
+      <!-- Courses Table -->
+      <section class="card courses-card" id="courses">
+        <div class="card-header">
+          <h3 class="card-title">My Courses</h3>
+          <span class="card-badge">Semester 5</span>
+        </div>
+        <div class="table-wrap">
+          <table class="courses-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Course Name</th>
+                <th>Instructor</th>
+                <th>Schedule</th>
+                <th>Credits</th>
+                <th>Attendance</th>
+                <th>Grade</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for e in enrollments %}
+              <tr>
+                <td><span class="course-code">{{ e.code }}</span></td>
+                <td class="course-name-cell">{{ e.name }}</td>
+                <td class="instructor-cell">{{ e.instructor }}</td>
+                <td class="schedule-cell">{{ e.schedule }}</td>
+                <td><span class="credits-pill">{{ e.credits }} cr</span></td>
+                <td>
+                  <div class="attendance-bar-wrap">
+                    <div class="attendance-bar" style="--pct: {{ e.attendance }}%"></div>
+                    <span class="attendance-label">{{ e.attendance }}%</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="grade-badge grade-{{ e.grade | replace('+','plus') | replace('-','minus') }}">
+                    {{ e.grade }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Announcements -->
+    <section class="card announcements-card" id="announcements">
+      <div class="card-header">
+        <h3 class="card-title">Announcements</h3>
+        <a href="#" class="view-all">View all →</a>
+      </div>
+      <div class="announcements-grid">
+        {% for a in announcements %}
+        <div class="announcement-item cat-{{ a.category | lower }}">
+          <div class="ann-meta">
+            <span class="ann-category">{{ a.category }}</span>
+            <span class="ann-date">{{ a.date }}</span>
+          </div>
+          <h4 class="ann-title">{{ a.title }}</h4>
+          <p class="ann-content">{{ a.content[:120] }}{% if a.content|length > 120 %}…{% endif %}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Active nav highlighting
+    const navItems = document.querySelectorAll('.nav-item');
+    const sections = document.querySelectorAll('section[id], div[id]');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(s => {
+        if (window.scrollY >= s.offsetTop - 120) current = s.id;
+      });
+      navItems.forEach(n => {
+        n.classList.toggle('active', n.getAttribute('href') === '#' + current);
+      });
+    });
+  </script>
+</body>
+</html>
